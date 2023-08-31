@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Runtime;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,8 +21,9 @@ namespace ConsoleApp1
 
 
             Console.WriteLine("escribe que valor vas usar \n " +
-                "1. cm \n" +
-                "2. mts");
+                "1. calular por CM\n" +
+                "2. Calcular por Mts\n" +
+                "3. caja recomendada de tu producto");
 
             while (!entrada)
             {
@@ -44,6 +46,12 @@ namespace ConsoleApp1
                             entrada = true;
 
                             break;
+                        case 3:
+                            Console.WriteLine("Recomendacion de tamaño cajas");
+                            entrada = true;
+                            recomendarCajas();
+
+                            break;
 
                         case 0:
                             Console.WriteLine("error");
@@ -58,8 +66,11 @@ namespace ConsoleApp1
 
             }
 
-        }
 
+
+
+        }
+ 
 
         private static float calcularVolumen(float ancho, float largo, float alto)
         {
@@ -76,6 +87,12 @@ namespace ConsoleApp1
             return volumen;
         }
 
+        static double convertirAmts(double nConvertir)
+        {
+            //Console.WriteLine("recibo "+nConvertir);
+            double mts = nConvertir / 100;
+            return mts;
+        }
 
         private static double convertirAcm(double nConvertir)
         {
@@ -83,16 +100,6 @@ namespace ConsoleApp1
             double cm = nConvertir * 100;
             return cm;
         }
-
-        private static double convertirAmts(double nConvertir)
-        {
-            //Console.WriteLine("recibo "+nConvertir);
-            double mts = nConvertir / 100;
-            return mts;
-        }
-
-
-
 
 
         //metodos
@@ -140,7 +147,7 @@ namespace ConsoleApp1
                 Console.WriteLine("el volumen del producto es: m3  " + vProductocm);
 
                 double resultado = rVolumen / vProductocm;
-                Console.WriteLine("Caben {0} cajas del mismo tamaño",(int)resultado);
+                Console.WriteLine("Caben {0} cajas del mismo tamaño", (int)resultado);
 
 
 
@@ -156,16 +163,16 @@ namespace ConsoleApp1
             double altocm = 0;
             double objeto = 0;
 
-            Console.WriteLine("largo en cm");
+            Console.Write("largo cm : ");
             largoCm = double.Parse(Console.ReadLine());
 
-            Console.WriteLine("ancho en cm");
+            Console.Write("ancho en cm: ");
             anchocm = double.Parse(Console.ReadLine());
 
-            Console.WriteLine("alto en cm");
+            Console.Write("alto en cm: ");
             altocm = double.Parse(Console.ReadLine());
 
-            Console.WriteLine("Caja de las mismas medidas o esfera");
+            Console.Write("Caja de las mismas medidas o esfera:  ");
             objeto = double.Parse(Console.ReadLine());
 
 
@@ -174,10 +181,6 @@ namespace ConsoleApp1
 
 
         }
-
-
-
-
 
         private static void cuantosCabenVolumen(double largo, double ancho, double alto, double objeto)
         {
@@ -201,10 +204,108 @@ namespace ConsoleApp1
             Console.WriteLine("\nel total de cajas dentro del contenedor es {0} piezas", resultado);
 
 
-            Console.WriteLine("caben {0} esferas dentro del contenedor " , (int)resultadoEsfera);
+            Console.WriteLine("caben {0} esferas dentro del contenedor ", (int)resultadoEsfera);
 
             //return resultado;
 
         }
+
+
+        private static void recomendarCajas()
+        {
+            Console.WriteLine("Ingresa las dimensiones de tu producto en centímetros:");
+            Console.Write("Ancho: ");
+            int anchoProducto = int.Parse(Console.ReadLine());
+            Console.Write("Largo: ");
+            int largoProducto = int.Parse(Console.ReadLine());
+            Console.Write("Alto: ");
+            int altoProducto = int.Parse(Console.ReadLine());
+
+            Producto productoUsuario = new Producto("Producto 1", anchoProducto, largoProducto, altoProducto);
+
+
+            // Dimensiones disponibles de las cajas (ancho x largo x alto)
+            List<Caja> cajas = new List<Caja>
+                {
+                    new Caja(26, 56, 30),
+                    new Caja(20, 10, 20),
+                    new Caja(30, 30, 30),
+                    new Caja(20, 50, 10)
+                    // Agrega más cajas según sea necesario
+                };
+
+            //Console.WriteLine("Ancho x Largo x Alto");
+            RecomendarCaja(productoUsuario, cajas);
+  
+
+
+        }
+
+        private static Caja RecomendarCaja(Producto producto, List<Caja> cajas)
+        {
+            // Implementa la lógica para recomendar la caja más adecuada para el producto
+            // (puedes basarte en criterios como el volumen, ajuste, etc.)
+
+            double volUsuario = calcularVolumen(producto.Largo, producto.Ancho, producto.Alto);
+
+            Console.WriteLine("volumen de tu producto:  " +volUsuario);
+
+            foreach (var item in cajas)
+            {
+                double resultado = calcularVolumen(item.Ancho, item.Alto, item.Largo);
+                Console.WriteLine("el tamaño de la caja: {0} volumen de: {1}", item.ToString(), resultado);
+
+                double compVolumen = resultado / volUsuario;
+                Console.WriteLine("en esta caja Cabe :" + (int)compVolumen);
+                Console.WriteLine("\n");
+
+
+            }
+
+
+            return cajas[0];
+            // Aquí, por simplicidad, se recomendará la primera caja disponible
+        }
+
+        class Producto
+        {
+            public string Nombre { get; set; }
+            public int Ancho { get; set; }
+            public int Largo { get; set; }
+            public int Alto { get; set; }
+
+            public Producto(string nombre, int ancho, int largo, int alto)
+            {
+                Nombre = nombre;
+                Ancho = ancho;
+                Largo = largo;
+                Alto = alto;
+            }
+        }
+
+
+        class Caja
+        {
+            public int Ancho { get; set; }
+            public int Largo { get; set; }
+            public int Alto { get; set; }
+
+            public Caja(int ancho, int largo, int alto)
+            {
+                Ancho = ancho;
+                Largo = largo;
+                Alto = alto;
+            }
+
+            public override string ToString()
+            {
+                return $"{Ancho}x{Largo}x{Alto}";
+            }
+        }
+
+
+
     }
+
+
 }
