@@ -12,56 +12,75 @@ namespace ConsoleApp1
 {
     class Program
     {
+
+
+        enum Opcion
+        {
+            CalcularPorCM = 1,
+            CalcularPorMts = 2,
+            RecomendarCajas = 3,
+            Salir = 0
+        }
+
         static void Main(string[] args)
         {
 
 
-            int opcion = 0;
             bool entrada = false;
 
+            Opcion opcion = Opcion.Salir; // Inicializamos con la opción "Salir"
 
-            Console.WriteLine("escribe que valor vas usar \n " +
-                "1. calular por CM\n" +
-                "2. Calcular por Mts\n" +
-                "3. caja recomendada de tu producto");
+            //Console.WriteLine("escribe que valor vas usar \n " +
+            //    "1. calular por CM\n" +
+            //    "2. Calcular por Mts\n" +
+            //    "3. caja recomendada de tu producto");
+
+            Console.WriteLine("Escribe el número de la opción que deseas:");
+            Console.WriteLine($"{(int)Opcion.CalcularPorCM}. Calcular por CM");
+            Console.WriteLine($"{(int)Opcion.CalcularPorMts}. Calcular por Mts");
+            Console.WriteLine($"{(int)Opcion.RecomendarCajas}. Recomendación de tamaño cajas");
+            Console.WriteLine($"{(int)Opcion.Salir}. Salir");
+
 
             while (!entrada)
             {
                 try
                 {
-                    opcion = int.Parse(Console.ReadLine());
+                    //opcion = int.Parse(Console.ReadLine());
+
+                    opcion = (Opcion)Enum.Parse(typeof(Opcion), Console.ReadLine());
+
 
                     switch (opcion)
                     {
-                        case 1:
-                            Console.WriteLine("opcion ingresar valores por centimetros");
-                            opcionCm();
+                        case Opcion.CalcularPorCM:
+                            Console.WriteLine("Opción ingresar valores por centímetros");
+                            OpcionCm();
                             entrada = true;
-
                             break;
-
-                        case 2:
-                            Console.WriteLine("opcion ingresar valores por Metros");
-                            metrosCubicos();
+                        case Opcion.CalcularPorMts:
+                            Console.WriteLine("Opción ingresar valores por Metros");
+                            MetrosCubicos();
                             entrada = true;
-
                             break;
-                        case 3:
-                            Console.WriteLine("Recomendacion de tamaño cajas");
+                        case Opcion.RecomendarCajas:
+                            Console.WriteLine("Recomendación de tamaño cajas");
                             entrada = true;
-                            recomendarCajas();
-
+                            RecomendarCajas();
                             break;
-
-                        case 0:
-                            Console.WriteLine("error");
+                        case Opcion.Salir:
+                            Console.WriteLine("Saliendo del programa");
+                            entrada = true;
+                            break;
+                        default:
+                            Console.WriteLine("Opción no válida. Introduce un número válido.");
                             break;
                     }
                 }
                 catch (Exception)
                 {
+                    Console.WriteLine("Opción no válida. Introduce un número válido.");
 
-                    throw;
                 }
 
             }
@@ -70,15 +89,34 @@ namespace ConsoleApp1
 
 
         }
- 
 
-        private static float calcularVolumen(float ancho, float largo, float alto)
+
+
+        private static Medidas insertarDatos()
         {
-            float volumen = ancho * largo * alto;
-            return volumen;
+
+            Medidas medidas = new Medidas();
+
+            Console.Write("ancho: ");
+            medidas.anchocm = double.Parse(Console.ReadLine());
+
+            Console.Write("largo: ");
+            medidas.largoCm = double.Parse(Console.ReadLine());
+
+            Console.Write("alto: ");
+            medidas.altocm = double.Parse(Console.ReadLine());
+
+            Console.Write("Caja de las mismas medidas o esfera:  ");
+            medidas.objeto = double.Parse(Console.ReadLine());
+
+            return medidas;
         }
 
-        private static double calcularVolumenEsfera(double tamanoEsfera)
+
+        private static double CalcularVolumen(double ancho, double largo, double alto) => ancho * largo * alto;
+
+
+        private static double CalcularVolumenEsfera(double tamanoEsfera)
         {
             //sacar mitad del tamaño total
             double radio = tamanoEsfera / 2;
@@ -87,47 +125,32 @@ namespace ConsoleApp1
             return volumen;
         }
 
-        static double convertirAmts(double nConvertir)
-        {
-            //Console.WriteLine("recibo "+nConvertir);
-            double mts = nConvertir / 100;
-            return mts;
-        }
+        static double ConvertirAmts(double nConvertir) => nConvertir / 100;
 
-        private static double convertirAcm(double nConvertir)
-        {
-            //Console.WriteLine("recibo "+nConvertir);
-            double cm = nConvertir * 100;
-            return cm;
-        }
+        private static double ConvertirAcm(double nConvertir) => nConvertir * 100;
 
 
-        //metodos
-        private static void metrosCubicos()
+        //opciones 
+        static void MetrosCubicos()
         {
 
-            float alto = 0;
-            float ancho = 0;
-            float largo = 0;
             bool entrada = false;
-            float volumenProducto = 0;
-
 
             while (!entrada)
             {
                 try
                 {
-                    Console.WriteLine("intruduce el alto del contenedor M");
-                    alto = float.Parse(Console.ReadLine());
+                    Medidas medidas = insertarDatos();
 
-                    Console.WriteLine("Introduce el largo contenedor m"); ;
-                    largo = float.Parse(Console.ReadLine());
+                    double rVolumen = CalcularVolumen(medidas.anchocm, medidas.largoCm, medidas.altocm);
+                    Console.WriteLine("el cvolumen del contedor es: {0} m3", rVolumen);
 
-                    Console.WriteLine("Introduce el ancho del contenedor m"); ;
-                    ancho = float.Parse(Console.ReadLine());
+                    double vProductocm = CalcularVolumen(medidas.objeto, medidas.objeto, medidas.objeto);
+                    Console.WriteLine("el volumen del producto es: m3  " + vProductocm);
 
-                    Console.WriteLine("escribe el volumen del producto");
-                    volumenProducto = float.Parse(Console.ReadLine());
+                    double resultado = rVolumen / vProductocm;
+                    Console.WriteLine("Caben {0} cajas del mismo tamaño", (int)resultado);
+
 
                     entrada = true;
                 }
@@ -137,61 +160,51 @@ namespace ConsoleApp1
                     //throw; para terminar eol programa de ejecucion 
                 }
 
-                double rVolumen = calcularVolumen(ancho, largo, alto);
-                Console.WriteLine("el cvolumen del contedor es: {0} m3", rVolumen);
-
-                //int convertidoCm = (int)convertirAcm(rVolumen);
-                //Console.WriteLine("el volumen del contedor es: cm3  " + convertidoCm);
-
-                double vProductocm = calcularVolumen(volumenProducto, volumenProducto, volumenProducto);
-                Console.WriteLine("el volumen del producto es: m3  " + vProductocm);
-
-                double resultado = rVolumen / vProductocm;
-                Console.WriteLine("Caben {0} cajas del mismo tamaño", (int)resultado);
-
-
-
             }
 
         }
 
-
-        private static void opcionCm()
+        static void OpcionCm()
         {
-            double largoCm = 0;
-            double anchocm = 0;
-            double altocm = 0;
-            double objeto = 0;
-
-            Console.Write("largo cm : ");
-            largoCm = double.Parse(Console.ReadLine());
-
-            Console.Write("ancho en cm: ");
-            anchocm = double.Parse(Console.ReadLine());
-
-            Console.Write("alto en cm: ");
-            altocm = double.Parse(Console.ReadLine());
-
-            Console.Write("Caja de las mismas medidas o esfera:  ");
-            objeto = double.Parse(Console.ReadLine());
+            bool entrada = false;
 
 
-            //double resultado = cuantoscaben(largoCm,anchocm, altocm,objeto);
-            cuantosCabenVolumen(largoCm, anchocm, altocm, objeto);
+            while (!entrada)
+            {
+                try
+                {
+                    Console.WriteLine("Ingresa las dimensiones de tu producto en centímetros:");
+
+                    Medidas medidas = insertarDatos();
+                    //double resultado = cuantoscaben(largoCm,anchocm, altocm,objeto);
+                    CuantosCabenVolumen(medidas.largoCm, medidas.anchocm, medidas.altocm, medidas.objeto);
+                    entrada = true;
+
+                }
+                catch
+                {
+                    Console.WriteLine("Dato incorrecto");
+                }
+
+
+            }
+
 
 
         }
 
-        private static void cuantosCabenVolumen(double largo, double ancho, double alto, double objeto)
+        static void CuantosCabenVolumen(double largo, double ancho, double alto, double objeto)
         {
-            double volumenCajaObjeto = calcularVolumen((float)objeto, (float)objeto, (float)objeto);
+            //Volumen de un caja con las mismas dimensiones 
+            double volumenCajaObjeto = CalcularVolumen((float)objeto, (float)objeto, (float)objeto);
 
-            double esfera = calcularVolumenEsfera(objeto);
+            //calcula el tamaño de la esfera
+            double esfera = CalcularVolumenEsfera(objeto);
 
-            double volumenCaja = calcularVolumen((float)ancho, (float)largo, (float)alto);
+            //se calcula el volumen de la caja que ingreso el usuario
+            double volumenCaja = CalcularVolumen((float)ancho, (float)largo, (float)alto);
 
             Console.WriteLine("volumen del contenedor: " + volumenCaja);
-
             Console.WriteLine("volumen caja objeto: " + volumenCajaObjeto);
             Console.WriteLine("Volumen esfera: " + esfera);
 
@@ -211,9 +224,11 @@ namespace ConsoleApp1
         }
 
 
-        private static void recomendarCajas()
+        static void RecomendarCajas()
         {
+
             Console.WriteLine("Ingresa las dimensiones de tu producto en centímetros:");
+
             Console.Write("Ancho: ");
             int anchoProducto = int.Parse(Console.ReadLine());
             Console.Write("Largo: ");
@@ -236,34 +251,32 @@ namespace ConsoleApp1
 
             //Console.WriteLine("Ancho x Largo x Alto");
             RecomendarCaja(productoUsuario, cajas);
-  
+
 
 
         }
 
-        private static Caja RecomendarCaja(Producto producto, List<Caja> cajas)
+        private static void RecomendarCaja(Producto producto, List<Caja> cajas)
         {
             // Implementa la lógica para recomendar la caja más adecuada para el producto
             // (puedes basarte en criterios como el volumen, ajuste, etc.)
 
-            double volUsuario = calcularVolumen(producto.Largo, producto.Ancho, producto.Alto);
+            double volUsuario = CalcularVolumen(producto.Largo, producto.Ancho, producto.Alto);
 
-            Console.WriteLine("volumen de tu producto:  " +volUsuario);
+            Console.WriteLine("volumen de tu producto:  " + volUsuario);
 
             foreach (var item in cajas)
             {
-                double resultado = calcularVolumen(item.Ancho, item.Alto, item.Largo);
+                double resultado = CalcularVolumen(item.Ancho, item.Alto, item.Largo);
                 Console.WriteLine("el tamaño de la caja: {0} volumen de: {1}", item.ToString(), resultado);
 
                 double compVolumen = resultado / volUsuario;
                 Console.WriteLine("en esta caja Cabe :" + (int)compVolumen);
                 Console.WriteLine("\n");
 
-
             }
 
 
-            return cajas[0];
             // Aquí, por simplicidad, se recomendará la primera caja disponible
         }
 
@@ -303,6 +316,15 @@ namespace ConsoleApp1
             }
         }
 
+
+        struct Medidas
+        {
+            public double largoCm { get; set; }
+            public double anchocm { get; set; }
+            public double altocm { get; set; }
+            public double objeto { get; set; }
+
+        }
 
 
     }
